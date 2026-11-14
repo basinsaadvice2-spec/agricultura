@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FARM SHIFT AI — Don’t predict the future. Explore it.</title>
+<meta name="description" content="Aide à la décision pour explorer et comparer des rotations de cultures. Prototype : données démo clairement signalées.">
+<meta name="theme-color" content="#0f3d2a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='16' fill='%231f6f4a'/%3E%3Ctext x='50' y='72' font-size='64' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--ink:#0f172a;--mut:#5b6672;--line:#e5e7eb;--g:#16a34a;--g2:#22c55e;--forest:#0f3d2a;--blue:#3b82f6;--demo:#b45309;--demobg:#fef3c7;--na:#475569;--nabg:#e2e8f0;--real:#166534;--realbg:#dcfce7;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1511;--card:#13211b;--ink:#e8efeb;--mut:#9db0a6;--line:#24372e;--demo:#fcd34d;--demobg:#3a2e0a;--na:#cbd5e1;--nabg:#27333d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1511;--card:#13211b;--ink:#e8efeb;--mut:#9db0a6;--line:#24372e;--demo:#fcd34d;--demobg:#3a2e0a;--na:#cbd5e1;--nabg:#27333d;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.app{display:flex;min-height:100vh}
+nav{width:230px;background:var(--forest);color:#d7ebe0;padding:20px 14px;position:sticky;top:0;height:100vh;flex:none}
+.brand{display:flex;gap:10px;align-items:center;font-weight:800;font-size:18px;color:#fff;margin:0 8px 4px}
+.brand svg{width:30px;height:30px}.slogan{font-size:12px;color:#8fd3ab;margin:0 8px 22px}
+nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:#cfe5d8;text-decoration:none;font-weight:500;margin-bottom:2px}
+nav a.on{background:var(--g);color:#fff}nav a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+main{flex:1;padding:28px;max-width:1080px;margin:0 auto;width:100%;min-width:0}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.02em}h2{font-size:17px;margin:0 0 10px}.sub{color:var(--mut);margin:0 0 20px}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.big{font-size:28px;font-weight:800;letter-spacing:-.02em}.mut{color:var(--mut);font-size:13px}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.b-demo{background:var(--demobg);color:var(--demo)}.b-na{background:var(--nabg);color:var(--na)}.b-real{background:var(--realbg);color:var(--real)}
+button,.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:11px 18px;background:var(--g);color:#fff;cursor:pointer;text-decoration:none;display:inline-block}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+label{display:block;font-weight:700;font-size:13px;margin:12px 0 5px}
+input,select{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 13px;border-radius:99px;font-weight:600}
+.chip.on{background:var(--forest);color:#fff;border-color:var(--forest)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mut);font-weight:600;font-size:13px}
+.tw{overflow-x:auto}.bar{height:9px;background:var(--line);border-radius:9px;overflow:hidden;margin:3px 0 9px}.bar i{display:block;height:100%;background:var(--g2)}
+.banner{background:var(--demobg);color:var(--demo);border-radius:12px;padding:10px 14px;margin-bottom:18px;font-size:13px;font-weight:600}
+.seq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:700}.seq span{background:var(--realbg);color:var(--real);padding:3px 10px;border-radius:8px}
+.chat{display:flex;flex-direction:column;gap:10px}.msg{padding:11px 14px;border-radius:14px;max-width:88%}.me{align-self:flex-end;background:var(--g);color:#fff}.ia{background:var(--card);border:1px solid var(--line)}
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:28px 26px;margin-bottom:18px;color:#fff;background:linear-gradient(135deg,#0f3d2a,#16794a 60%,#1f8f6b);background-size:200% 200%;animation:flow 12s ease-in-out infinite}
+.hero h1{color:#fff;position:relative}.hero p{margin:0 0 4px;color:#d7f0e1;position:relative;max-width:46ch}.hero .clim{font-size:13px;color:#bfe8cf}.hero a{color:#fff}
+.orb{position:absolute;width:190px;height:190px;border-radius:50%;right:-40px;top:-60px;background:radial-gradient(circle at 35% 35%,#3b82f6aa,#3b82f600 70%);animation:float 7s ease-in-out infinite}.o2{width:140px;height:140px;right:90px;top:auto;bottom:-70px;background:radial-gradient(circle,#22c55eaa,#22c55e00 70%);animation-delay:-3s}
+.sat{position:absolute;right:18px;top:14px;width:96px;opacity:.9}.orbit{transform-origin:60px 60px;animation:spin 14s linear infinite}
+@keyframes flow{50%{background-position:100% 50%}}@keyframes float{50%{transform:translateY(16px) scale(1.06)}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes grow{from{transform:scaleX(0)}}@keyframes pulse{50%{opacity:.35}}
+#v.in>*{animation:rise .55s cubic-bezier(.2,.7,.2,1) both}#v.in>*:nth-child(2){animation-delay:.08s}#v.in>*:nth-child(3){animation-delay:.16s}#v.in>*:nth-child(4){animation-delay:.24s}#v.in>*:nth-child(n+5){animation-delay:.32s}
+.card{transition:transform .25s,box-shadow .25s}.card:hover{transform:translateY(-3px);box-shadow:0 10px 28px #0f3d2a22}button,.btn{transition:transform .15s,filter .2s}button:active,.btn:active{transform:scale(.96)}button:hover,.btn:hover{filter:brightness(1.08)}
+.bar i{transform-origin:left;animation:grow 1s cubic-bezier(.2,.7,.2,1) both}.seq span{animation:rise .5s both}.seq span:nth-child(3){animation-delay:.12s}.seq span:nth-child(5){animation-delay:.24s}
+.msg{animation:rise .35s both;white-space:pre-wrap}.ask{display:flex;gap:8px;margin-top:14px}.ask input{flex:1}.dots i{display:inline-block;width:7px;height:7px;margin-right:4px;border-radius:50%;background:var(--g);animation:pulse 1s infinite}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+.dots2{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}.dots2 span{padding:5px 12px;border-radius:99px;background:var(--nabg);color:var(--na);font-size:13px;font-weight:700}.dots2 span.ok{background:var(--realbg);color:var(--real)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.banner.ok{background:var(--realbg);color:var(--real)}
+.mb{display:flex;gap:4px;align-items:flex-end;height:110px}.mb i{flex:1;background:var(--blue);opacity:.4;border-radius:4px 4px 0 0;transform-origin:bottom;animation:grow2 .9s both}.mb i.w{background:var(--g2);opacity:1}.ml{display:flex;gap:4px}.ml span{flex:1;text-align:center;font-size:11px;color:var(--mut)}@keyframes grow2{from{transform:scaleY(0)}}
+body{font-size:16px;line-height:1.6}main{padding:24px 20px 28px}
+h1{font-size:28px;line-height:1.2;margin-bottom:6px}h2{font-size:18px;margin-bottom:12px}
+.sub{font-size:15px;margin-bottom:18px;max-width:60ch}.grid{gap:16px}
+.card{padding:20px;border-radius:18px;box-shadow:0 1px 2px #0f3d2a14}
+.big{font-size:34px;line-height:1.1;margin:4px 0 8px}
+button,.btn{min-height:46px;padding:12px 20px;font-size:15px;border-radius:12px}
+input,select{min-height:46px;font-size:16px;border-radius:12px}
+label{font-size:14px;margin:16px 0 6px}.chip{min-height:40px;font-size:15px}
+.banner{font-size:14px;line-height:1.45;border-radius:14px}
+table{font-size:15px}th,td{padding:12px 8px}.mut{font-size:14px}.tabs a{font-size:10.5px;padding:9px 1px}
+.rg td:first-child{font-weight:700}.rg tr.me td{background:var(--realbg);color:var(--real)}
+@media (max-width:760px){main{padding:16px 16px 110px}h1{font-size:24px}.hero{padding:22px 18px;border-radius:18px}.msg{max-width:94%}}
+.fab{position:fixed;right:14px;bottom:20px;z-index:30;background:var(--blue);color:#fff;padding:12px 18px;border-radius:99px;font-weight:800;text-decoration:none;box-shadow:0 8px 22px #0005;animation:rise .6s both}@media (max-width:760px){.fab{bottom:calc(74px + env(safe-area-inset-bottom,0px))}}
+h1{text-wrap:balance}.card{box-shadow:0 1px 2px #0f172a0f}.chip{padding:10px 15px}
+.tabs a b{display:block;font-size:19px;line-height:1.15;font-weight:400}
+.fab{width:54px;height:54px;padding:0;display:grid;place-items:center;font-size:24px;border-radius:50%}
+.vp{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;position:relative}.vp span{background:#ffffff26;padding:5px 12px;border-radius:99px;font-size:13px;font-weight:700}
+@media (max-width:760px){#soilc{order:-1}.hero{padding:22px 18px}.tabs{border-top:1px solid #ffffff1f}}
+.tabs{display:none}
+@media (max-width:760px){nav{display:none}main{padding:18px 16px 96px}.tabs{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--forest);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;overflow-x:auto}.tabs a{flex:1;min-width:0;text-align:center;color:#cfe5d8;text-decoration:none;font-size:10px;padding:7px 1px;border-radius:8px;overflow:hidden;white-space:nowrap}.tabs a.on{background:var(--g);color:#fff}h1{font-size:22px}}
+:root{--g:#1f6f4a;--g2:#3f8f67;--forest:#14352a;--blue:#2f5d8a}
+body{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.55;font-variant-numeric:tabular-nums}
+h1{font-size:24px;font-weight:600;letter-spacing:-.01em}h2{font-size:15px;font-weight:600;margin-bottom:10px}.sub{font-size:14px}
+.hero{background:var(--forest);animation:none;border-radius:10px;padding:20px 22px}.hero h1{font-size:22px}.orb,.sat{display:none}
+.card{border-radius:10px;box-shadow:none;padding:18px}.card:hover{transform:none;box-shadow:none}
+.big{font-size:28px;font-weight:600;letter-spacing:-.01em}
+button,.btn{border-radius:8px;font-weight:600;min-height:44px}button:hover,.btn:hover{filter:none;opacity:.92}button:active,.btn:active{transform:none}button.sec{border-color:#b9c2bc}
+.chip{border-radius:8px;font-weight:500}.badge{border-radius:4px;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.banner{border-radius:6px;border-left:3px solid currentColor;font-weight:500}th{font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+nav a{border-radius:6px}nav a.on{background:#ffffff1a;box-shadow:inset 3px 0 0 #7bc79e;color:#fff}
+.tabs a b{display:none}.tabs a{font-size:11px;padding:12px 1px}.tabs a.on{background:#ffffff1a;box-shadow:inset 0 2px 0 #7bc79e;color:#fff}
+.msg{border-radius:8px}.me{background:var(--forest)}.dots2 span{border-radius:4px;font-weight:600}.seq span{border-radius:4px;animation:none}
+.fab{width:auto;height:auto;padding:12px 16px;display:block;font-size:0;border-radius:8px;background:var(--forest);box-shadow:0 2px 8px #0003;animation:none}.fab::after{content:"Assistant IA";font-size:14px;font-weight:600}
+#v.in>*{animation:fade .3s both}#v.in>*:nth-child(n){animation-delay:0s}@keyframes fade{from{opacity:0}}
+.bar{height:8px;border-radius:4px}.bar i{background:var(--g)}.mb i{background:var(--blue)}.mb i.w{background:var(--g)}
+:root{--forest:#1f2d3a;--g:#2f6f5e;--g2:#4c8a77;--blue:#3a6486}
+.hero{background:none;color:var(--ink);padding:0 0 18px;margin-bottom:20px;border-radius:0;border-bottom:1px solid var(--line)}
+.hero h1,.hero p{color:var(--ink)}.hero .clim,.hero a{color:var(--mut)}.hero p{max-width:60ch}
+.banner{background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:3px solid #b7791f;font-weight:400}.banner.ok{border-left-color:var(--g);background:var(--card);color:var(--ink)}
+.g4 .card>.mut:first-child{text-transform:uppercase;letter-spacing:.05em;font-size:11.5px}
+.big{font-weight:500;font-size:26px}.chip{border-radius:6px}.badge{border-radius:3px}.b-real{background:#e3efe9;color:#1f5a47}
+nav a.on{box-shadow:inset 3px 0 0 #8fb8a8}.tabs a.on{box-shadow:inset 0 2px 0 #8fb8a8}.slogan{color:#9fb4c4}
+.vp span{border-radius:4px;background:var(--nabg);color:var(--na);font-weight:600;font-size:12px;padding:4px 10px}
+</style>
+</head>
+<body>
+<div class="app">
+<nav aria-label="Navigation principale">
+<div class="brand"><svg viewBox="0 0 32 32" fill="none"><path d="M16 29V14M16 18C9 18 5 13 5 6c7 0 11 4 11 12zM16 14c0-6 4-9 11-9 0 6-4 10-11 9z" stroke="#22c55e" stroke-width="2.4" stroke-linejoin="round"/></svg>FARM SHIFT AI</div>
+<p class="slogan">Don’t predict the future. Explore it.</p>
+<div id="nav"></div>
+</nav>
+<main id="v"></main>
+</div>
+<div class="tabs" id="tabs"></div>
+<script>
+const CROPS=[
+{id:"mais",n:"Maïs",f:"Céréale",cycle:"90–120 j",eau:2,az:-2,p:8,note:"Gros consommateur d’azote."},
+{id:"manioc",n:"Manioc",f:"Racine",cycle:"10–18 mois",eau:1,az:-1,p:7,note:"Tolère la sécheresse ; cycle très long."},
+{id:"soja",n:"Soja",f:"Légumineuse",cycle:"90–120 j",eau:2,az:2,p:6,note:"Fixe l’azote de l’air."},
+{id:"haricot",n:"Haricot",f:"Légumineuse",cycle:"60–90 j",eau:2,az:2,p:5,note:"Cycle court, bon précédent."},
+{id:"riz",n:"Riz",f:"Céréale",cycle:"90–150 j",eau:3,az:-1,p:7,note:"Très exigeant en eau."},
+{id:"arachide",n:"Arachide",f:"Légumineuse",cycle:"90–130 j",eau:1,az:2,p:5,note:"Faible besoin en eau, fixe l’azote."}];
+const C=Object.fromEntries(CROPS.map(c=>[c.id,c]));
+const SUPPLY={"Pluie seule":1.55,"Pluie + puits":2,"Irrigation":2.3};
+const ZONES={"RD Congo":{"Kinshasa":{c:"Tropical à saison sèche (≈ juin–septembre), pluies d’octobre à mai."},"Kongo Central":{c:"Tropical, saison sèche ≈ mai–septembre."},"Équateur":{c:"Équatorial humide, pluies presque toute l’année."},"Kasaï":{c:"Tropical, saison sèche ≈ mai–août."},"Haut-Katanga":{c:"Tropical d’altitude, pluies ≈ novembre–mars, saison sèche marquée."},"Kivu":{c:"Climat d’altitude, plus tempéré, deux saisons des pluies."}},"Cameroun":{"Nord":{c:"Soudano-sahélien, pluies ≈ mai–octobre.",sec:1},"Centre / Littoral":{c:"Équatorial, deux saisons des pluies."},"Ouest":{c:"Climat d’altitude, une longue saison des pluies."}},"Côte d’Ivoire":{"Sud":{c:"Équatorial, deux saisons des pluies."},"Nord":{c:"Savane, une saison des pluies ≈ mai–octobre.",sec:1}},"Sénégal":{"Nord / Centre":{c:"Sahélien, pluies ≈ juillet–octobre.",sec:1},"Casamance":{c:"Tropical humide, pluies ≈ juin–octobre."}},"Madagascar":{"Hauts-Plateaux":{c:"Tropical d’altitude, pluies ≈ novembre–avril."},"Côte est":{c:"Tropical très humide, pluies abondantes."}}};
+const zoneInfo=f=>(ZONES[f.pays]||{})[f.zone]||null;
+const DEF={pays:"",zone:"",saved:false,asked:false,nom:"Ma ferme",loc:"",ha:12,sol:"Non déterminé",eau:"Pluie + puits",prev:["mais","manioc"],ans:3,pool:["mais","manioc","soja","haricot"]};
+let S=load();let R=loadR();
+function loadR(){try{return JSON.parse(localStorage.getItem("fsai_r")||"null")}catch(e){return null}}
+function saveR(){try{localStorage.setItem("fsai_r",JSON.stringify(R))}catch(e){}}
+function load(){try{const x=JSON.parse(localStorage.getItem("fsai")||"null");return Object.assign({},DEF,x||{})}catch(e){return {...DEF}}}
+function save(){try{localStorage.setItem("fsai",JSON.stringify(S))}catch(e){}}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clamp=x=>Math.max(0,Math.min(100,Math.round(x)));
+/* ---- Moteur de simulation (déterministe, hypothèses illustratives) ---- */
+function evaluate(seq,farm){
+ const zi=zoneInfo(farm);const sup=(SUPPLY[farm.eau]||2)-(zi&&zi.sec?0.3:0)+({Sableux:-.25,"Sablo-argileux":-.1,Argileux:.1}[farm.sol]||0);let prod=0,def=0,eau=0,az=0,rep=0,notes=[];
+ seq.forEach((id,i)=>{const c=C[id],prev=i?C[seq[i-1]]:null;let p=c.p*10;const d=Math.max(0,c.eau-sup);
+  if(prev&&prev.id===c.id){p*=.7;rep++;notes.push(`An ${i+1} : ${c.n} après ${c.n} → monoculture, rendement relatif réduit (−30 %), risque sanitaire.`)}
+  else if(prev&&prev.f===c.f){p*=.88;notes.push(`An ${i+1} : ${c.n} après ${prev.n} (même famille) → −12 %.`)}
+  if(prev&&prev.f==="Légumineuse"&&c.f==="Céréale"){p*=1.08;notes.push(`An ${i+1} : ${c.n} profite de l’azote laissé par ${prev.n} (+8 %).`)}
+  if(d>0){p*=1-.15*d;notes.push(`An ${i+1} : ${c.n} dépasse l’eau disponible (${farm.eau}) → pénalité hydrique.`)}
+  prod+=p;def+=d;eau+=c.eau;az+=c.az});
+ const n=seq.length,div=new Set(seq).size;
+ return{seq,notes,prod:clamp(prod/n),sol:clamp(50+(az/n)*12+(div>=3?8:0)-rep*10),eau:clamp(100-20*(eau/n)-35*(def/n))};
+}
+function best(pool,n,farm,key){let b=null,bs=-1;const rec=(s)=>{if(s.length===n){const e=evaluate(s,farm);if(e[key]>bs||(e[key]===bs&&b&&e.prod>b.prod)){bs=e[key];b=e}return}pool.forEach(id=>rec(s.concat(id)))};rec([]);return b}
+function run(){
+ const pool=S.pool;if(pool.length<2){R={err:"Choisissez au moins 2 cultures."};return}
+ R={sc:[["Scénario 1 — Productivité","prod"],["Scénario 2 — Santé du sol","sol"],["Scénario 3 — Économie d’eau","eau"]].map(([t,k])=>({t,k,e:best(pool,S.ans,S,k)}))};
+}
+/* ---- UI ---- */
+const PAGES=[["accueil","Accueil","🏠"],["profil","Exploitation","🌾"],["calendrier","Calendrier","📅"],["donnees","Données EO","🛰️"],["cultures","Cultures","🌱"],["simulateur","Simulateur","🔁"],["assistant","Assistant IA","✦"]];
+const badge=s=>`<span class="badge ${s==="DÉMO"?"b-demo":s==="RÉEL"?"b-real":"b-na"}">${s}</span>`;
+let OBS=null;
+const COORD={"RD Congo|Kinshasa":[-4.33,15.31],"RD Congo|Kongo Central":[-5.82,13.46],"RD Congo|Équateur":[0.05,18.26],"RD Congo|Kasaï":[-5.9,22.42],"RD Congo|Haut-Katanga":[-11.66,27.48],"RD Congo|Kivu":[-2.51,28.86],"Cameroun|Nord":[9.3,13.39],"Cameroun|Centre / Littoral":[3.85,11.5],"Cameroun|Ouest":[5.48,10.42],"Côte d’Ivoire|Sud":[5.36,-4.01],"Côte d’Ivoire|Nord":[9.46,-5.63],"Sénégal|Nord / Centre":[14.15,-16.08],"Sénégal|Casamance":[12.58,-16.27],"Madagascar|Hauts-Plateaux":[-18.91,47.52],"Madagascar|Côte est":[-18.15,49.4]};
+`RD Congo|Kinshasa|-4.33|15.31|Tropical à saison sèche (≈ juin–septembre), pluies d’octobre à mai.|0|Sableux
+RD Congo|Kinshasa — Est|-4.40|15.60|Tropical à saison sèche (≈ juin–septembre), pluies d’octobre à mai.|0|Sableux
+RD Congo|Kinshasa — Ouest|-4.45|15.20|Tropical à saison sèche (≈ juin–septembre), pluies d’octobre à mai.|0|Sableux
+RD Congo|Kinshasa — Sud|-4.55|15.30|Tropical à saison sèche (≈ juin–septembre), pluies d’octobre à mai.|0|Sableux
+RD Congo|Kinshasa — Nord-Ouest|-4.36|15.20|Tropical à saison sèche (≈ juin–septembre), pluies d’octobre à mai.|0|Sableux
+Congo|Brazzaville|-4.27|15.28|Tropical humide, saison sèche ≈ juin–septembre.|0|
+Congo|Nord (Likouala)|1.62|18.07|Équatorial humide, pluies presque toute l’année.|0|
+Gabon|Estuaire|0.39|9.45|Équatorial, deux saisons des pluies.|0|
+Gabon|Haut-Ogooué|-1.63|13.58|Équatorial, saison sèche ≈ juin–août.|0|
+Centrafrique|Sud (Bangui)|4.36|18.56|Tropical humide, saison sèche ≈ novembre–février.|0|
+Tchad|Sud (Moundou)|8.57|16.08|Soudanien, pluies ≈ mai–octobre.|0|
+Burundi|Plateau central|-3.43|29.93|Climat d’altitude tempéré, saison sèche ≈ juin–août.|0|
+Rwanda|Kigali|-1.95|30.06|Altitude tempérée, deux saisons des pluies.|0|
+Rwanda|Province de l’Est|-1.88|30.62|Plus chaud et plus sec que l’ouest, deux saisons des pluies.|0|
+Ouganda|Centre (Kampala)|0.35|32.58|Équatorial tempéré par l’altitude, deux saisons des pluies.|0|
+Ouganda|Nord (Gulu)|2.77|32.3|Une longue saison des pluies ≈ avril–octobre.|0|
+Kenya|Highlands (Nakuru)|-0.3|36.07|Altitude, deux saisons des pluies (mars–mai, octobre–décembre).|0|
+Kenya|Zone semi-aride (Garissa)|-0.45|39.65|Semi-aride, pluies faibles et irrégulières.|1|
+Tanzanie|Nord (Arusha)|-3.37|36.68|Deux saisons des pluies (mars–mai, novembre–décembre).|0|
+Tanzanie|Sud-Ouest (Mbeya)|-8.9|33.46|Une saison des pluies ≈ novembre–avril.|0|
+Éthiopie|Hauts plateaux (Addis-Abeba)|9.03|38.74|Altitude, pluies principales ≈ juin–septembre.|0|
+Éthiopie|Rift (Hawassa)|7.06|38.48|Tropical d’altitude moyenne, pluies ≈ mars–septembre.|0|
+Zambie|Lusaka|-15.39|28.32|Pluies ≈ novembre–avril, saison sèche marquée.|0|
+Zambie|Nord (Kasama)|-10.21|31.18|Pluies plus abondantes ≈ novembre–avril.|0|
+Zimbabwe|Harare|-17.83|31.05|Pluies ≈ novembre–mars.|0|
+Malawi|Lilongwe|-13.98|33.78|Pluies ≈ novembre–avril.|0|
+Mozambique|Sud (Maputo)|-25.97|32.57|Subtropical, pluies d’été, plus sec dans l’intérieur.|1|
+Mozambique|Zambézie (Quelimane)|-17.88|36.89|Tropical humide, pluies ≈ novembre–avril.|0|
+Angola|Luanda (côte)|-8.84|13.23|Côte semi-aride, pluies faibles.|1|
+Angola|Plateau (Huambo)|-12.78|15.74|Plateau, pluies ≈ octobre–avril.|0|
+Afrique du Sud|Gauteng|-26.2|28.05|Pluies d’été (octobre–mars), hivers secs.|0|
+Afrique du Sud|Cap-Occidental|-33.92|18.42|Méditerranéen, pluies surtout en hiver.|0|
+Nigeria|Nord (Kano)|12.0|8.52|Soudano-sahélien, pluies ≈ mai–septembre.|1|
+Nigeria|Sud-Ouest (Ibadan)|7.38|3.95|Tropical humide, deux saisons des pluies.|0|
+Ghana|Forêt (Kumasi)|6.69|-1.62|Tropical humide, deux saisons des pluies.|0|
+Ghana|Nord (Tamale)|9.4|-0.84|Savane, une saison des pluies ≈ mai–octobre.|1|
+Mali|Sud (Sikasso)|11.32|-5.67|Soudanien, pluies ≈ mai–octobre.|0|
+Mali|Centre (Mopti)|14.49|-4.2|Sahélien, pluies courtes ≈ juillet–septembre.|1|
+Burkina Faso|Sud-Ouest (Bobo-Dioulasso)|11.18|-4.3|Soudanien, pluies ≈ mai–octobre.|0|
+Burkina Faso|Centre (Ouagadougou)|12.37|-1.52|Soudano-sahélien, pluies ≈ juin–septembre.|1|
+Niger|Sud (Maradi)|13.5|7.1|Sahélien, pluies ≈ juin–septembre.|1|
+Bénin|Sud (Cotonou)|6.37|2.43|Subquatorial, deux saisons des pluies.|0|
+Bénin|Nord (Parakou)|9.34|2.63|Soudanien, une saison des pluies.|0|
+Togo|Maritime (Lomé)|6.13|1.22|Subquatorial, deux saisons des pluies.|0|
+Togo|Savanes (Dapaong)|10.86|0.21|Soudanien, une saison des pluies.|1|
+Guinée|Basse-Guinée (Conakry)|9.64|-13.58|Tropical très humide, pluies ≈ mai–octobre.|0|
+Guinée|Haute-Guinée (Kankan)|10.38|-9.31|Soudanien, pluies ≈ mai–octobre.|0|
+Maroc|Gharb (Rabat)|34.02|-6.84|Méditerranéen, pluies surtout en hiver.|0|
+Maroc|Souss (Agadir)|30.43|-9.6|Semi-aride, pluies faibles.|1|
+Algérie|Nord (Alger)|36.75|3.06|Méditerranéen, pluies surtout en hiver.|0|
+Algérie|Hauts plateaux (Sétif)|36.19|5.41|Semi-aride continental.|1|
+Tunisie|Nord (Tunis)|36.81|10.18|Méditerranéen, pluies surtout en hiver.|0|
+Tunisie|Centre-Sud (Sfax)|34.74|10.76|Aride à semi-aride.|1|
+Égypte|Delta du Nil (Tanta)|30.79|31.0|Aride, agriculture irriguée par le Nil.|1|
+Égypte|Haute-Égypte (Assouan)|24.09|32.9|Désertique, irrigation indispensable.|1|
+France|Centre (Orléans)|47.9|1.9|Tempéré océanique, pluies toute l’année.|0|
+Brésil|Mato Grosso (Cuiabá)|-15.6|-56.1|Tropical, saison des pluies ≈ octobre–avril.|0|
+Inde|Pendjab (Chandigarh)|30.73|76.78|Subtropical, mousson ≈ juillet–septembre.|0|
+Vietnam|Delta du Mékong (Can Tho)|10.03|105.77|Tropical, mousson ≈ mai–novembre.|0|`.trim().split("\n").forEach(l=>{const [p,z,a,o,c,s,so]=l.split("|");(ZONES[p]=ZONES[p]||{})[z]={c,sec:+s||0,sol:so||""};COORD[p+"|"+z]=[+a,+o]});
+const coords=()=>(S.lat!=null&&S.lon!=null)?[S.lat,S.lon]:(COORD[S.pays+"|"+S.zone]||null);
+function ind(){const o=OBS&&OBS.ok?OBS:null,st=o?"RÉEL":"INDISPONIBLE",rs="≈ 0,5° × 0,625°, quotidien",d=o?o.date:"—";return[["Humidité du sol (zone racinaire)",o?Math.round(o.wet*100)+" %":"—","NASA POWER · GWETROOT (modèle MERRA-2, pas SMAP)",st,d,o?rs:"—"],["Précipitations (7 derniers jours)",o?Math.round(o.rain7)+" mm":"—","NASA POWER · PRECTOTCORR",st,d,o?rs:"—"],["Température de l’air (2 m)",o?Math.round(o.t2m)+" °C":"—","NASA POWER · T2M",st,d,o?rs:"—"],["Végétation (NDVI)","—","NASA MODIS / Landsat (non connecté)","INDISPONIBLE","—","—"]]}
+function obsBanner(){if(!OBS)return`<div class="banner">Aucune donnée chargée. Choisissez une zone ou utilisez votre position.</div>`;if(OBS.loading)return`<div class="banner">Chargement des données NASA POWER…</div>`;if(OBS.ok)return`<div class="banner ok">Données NASA POWER · valeurs du ${OBS.date} · grille ≈ 50 km (indicatif).</div>`;return`<div class="banner">${esc(OBS.err)} Rien n’est inventé.</div>`}
+let SOIL=null;
+const SOLTIP={Sableux:"Draine vite et retient peu l’eau et les nutriments : fractionnez les engrais, ajoutez de la matière organique, paillez.","Sablo-argileux":"Bon compromis : retient assez d’eau tout en drainant. Protégez-le contre l’érosion sur les pentes.",Argileux:"Retient l’eau et les nutriments, mais risque d’engorgement et de croûte : évitez de travailler le sol mouillé.",Limoneux:"Fertile mais sensible à la battance et à l’érosion : couvrez le sol.","Latéritique":"Souvent acide et pauvre : chaulage, matière organique et légumineuses aident."};
+const soilType=(sa,cl,si)=>sa>=70&&cl<20?"Sableux":cl>=35?"Argileux":si>=50?"Limoneux":sa>=45?"Sablo-argileux":"Limoneux";
+const GUIDE="Pour caractériser votre sol :\n1. Texture : roulez une poignée de terre humide en boudin. Elle s’effrite : sableux. Le boudin se casse : sablo-argileux ou limoneux. Il forme un anneau lisse sans se fissurer : argileux.\n2. Drainage : creusez un trou de 30 cm, remplissez-le d’eau. Si elle stagne longtemps, le drainage est lent.\n3. pH : bandelettes ou analyse en laboratoire.\n4. Faites confirmer par un technicien agricole ou un laboratoire, puis indiquez-le dans « Exploitation ».";
+const solLabel=()=>S.sol.toLowerCase()+(S.solConf==="oui"?" (confirmé)":S.sol==="Non déterminé"?"":" (estimation)");
+function soilConf(){const o=(a,v)=>a.map(([k,l])=>`<option value="${k}"${v===k?" selected":""}>${l}</option>`).join("");return`<hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><p class="mut"><b>Estimation régionale : ce n’est pas une analyse de votre parcelle.</b></p><label for="sc">Ce sol a-t-il été confirmé par un spécialiste ?</label><select id="sc">${o([["","À préciser"],["oui","Oui (analyse ou technicien agricole)"],["non","Non, estimation seulement"]],S.solConf||"")}</select><label for="ph">pH du sol (si connu)</label><input id="ph" inputmode="decimal" placeholder="ex. 5,5" value="${esc(S.ph||"")}"><label for="dr">Drainage observé</label><select id="dr">${o([["","À préciser"],["rapide","Rapide (l’eau s’infiltre vite)"],["moyen","Moyen"],["lent","Lent (flaques, sol détrempé)"]],S.drain||"")}</select><p><button class="sec" id="askSoil">Décrire mon sol avec l’assistant</button></p>`}
+let RZ="pays";const SOLCOL={Sableux:"#c9a227","Sablo-argileux":"#c07a3a",Argileux:"#8a4b38",Limoneux:"#7a8f5a","Latéritique":"#a0453a"};
+function regMap(){const it=REG.items.filter(i=>COORD[S.pays+"|"+i.zone]);if(!it.length)return"";const me=COORD[S.pays+"|"+S.zone]||(S.lat!=null?[S.lat,S.lon]:null);let pts=it.map(i=>({i,c:COORD[S.pays+"|"+i.zone]}));if(RZ==="zone"&&me)pts=pts.filter(p=>Math.abs(p.c[0]-me[0])<1.5&&Math.abs(p.c[1]-me[1])<1.5);if(!pts.length)return"";
+ const la=pts.map(p=>p.c[0]),lo=pts.map(p=>p.c[1]),a0=Math.min(...la),a1=Math.max(...la),o0=Math.min(...lo),o1=Math.max(...lo),W=320,H=190,P=36,k=Math.min((W-2*P)/Math.max(o1-o0,.01),(H-2*P)/Math.max(a1-a0,.01)),X=o=>W/2+(o-(o0+o1)/2)*k,Y=a=>H/2-(a-(a0+a1)/2)*k;
+ return`<div class="chips" style="margin-bottom:8px"><button class="chip${RZ==="pays"?" on":""}" data-rz="pays">Tout le pays</button><button class="chip${RZ==="zone"?" on":""}" data-rz="zone">Autour de ma zone</button></div><svg viewBox="0 0 ${W} ${H}" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px" role="img" aria-label="Carte schématique des sols de la région">${pts.map(p=>{const m=p.i.zone===S.zone,x=X(p.c[1]),y=Y(p.c[0]);return`<circle cx="${x}" cy="${y}" r="${m?9:7}" fill="${SOLCOL[p.i.type]||"#9aa5a0"}" stroke="${m?"var(--ink)":"#fff"}" stroke-width="${m?2.5:1.5}"/><text x="${x}" y="${y-12}" text-anchor="middle" font-size="9" fill="var(--ink)">${esc(p.i.zone.replace("Kinshasa — ","K. ").slice(0,16))}</text>`}).join("")}</svg><div class="mut" style="margin:6px 0 10px">${Object.entries(SOLCOL).map(([t,c])=>`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${c};margin-right:4px"></span>${t}`).join(" · ")}</div>`}
+function soilCard(){let h="<h2>Sol estimé pour votre zone</h2>";if(SOIL&&SOIL.loading)h+='<p class="mut">Chargement…</p>';else if(SOIL&&SOIL.ok)h+=`<p><b>${SOIL.type}</b></p><p class="mut">Sable ${Math.round(SOIL.sand)} % · Argile ${Math.round(SOIL.clay)} % · Limon ${Math.round(SOIL.silt)} % (0–30 cm)<br>Source : ISRIC SoilGrids (modélisé, 250 m). La NASA fournit la météo et l’humidité, pas le type de sol.</p>`;else if(SOIL){const z=zoneInfo(S);h+=`<p class="mut">SoilGrids injoignable (${esc(SOIL.err)}). ${z&&z.sol?"Repère général pour cette zone : "+z.sol+".":"Choisissez le type de sol à la main."}</p>`}else h+='<p class="mut">Choisissez une zone ou utilisez votre position.</p>';const t=SOLTIP[S.sol];return h+(t?`<p>${t}</p>`:"")+soilConf()}
+async function loadSoil(){const c=coords();if(!c){SOIL=null;return}SOIL={loading:true};
+ try{const r=await fetch(`https://rest.isric.org/soilgrids/v2.0/properties/query?lon=${c[1]}&lat=${c[0]}&property=sand&property=clay&property=silt&depth=0-5cm&depth=5-15cm&depth=15-30cm&value=mean`);if(!r.ok)throw new Error("HTTP "+r.status);
+  const L=(await r.json()).properties.layers,g=n=>{const l=L.find(x=>x.name===n),v=l.depths.map(d=>d.values.mean).filter(v=>v!=null);if(!v.length)throw new Error("pas de valeur");return v.reduce((a,b)=>a+b,0)/v.length/((l.unit_measure||{}).d_factor||10)};
+  const sa=g("sand"),cl=g("clay"),si=g("silt");SOIL={ok:true,sand:sa,clay:cl,silt:si,type:soilType(sa,cl,si)};if(S.solAuto!==false){S.sol=SOIL.type;save()}}
+ catch(e){SOIL={ok:false,err:e.message||String(e)};const z=zoneInfo(S);if(z&&z.sol&&S.solAuto!==false){S.sol=z.sol;save()}}
+ const sc=document.querySelector("#soilc"),sl=document.querySelector("#sol");if(sc)sc.innerHTML=soilCard();if(sl)sl.value=S.sol}
+let CLIM=null;const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],JM=[31,28.25,31,30,31,30,31,31,30,31,30,31],CYC={mais:4,manioc:12,soja:4,haricot:3,riz:5,arachide:4};
+async function loadClim(){const c=coords();if(!c){CLIM=null;return}CLIM={loading:true};
+ try{const r=await fetch(`https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=PRECTOTCORR&community=AG&longitude=${c[1]}&latitude=${c[0]}&format=JSON`);if(!r.ok)throw new Error("HTTP "+r.status);const p=(await r.json()).properties.parameter.PRECTOTCORR,K=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],mm=K.map((k,i)=>p[k]*JM[i]);if(mm.some(v=>!(v>=0)))throw new Error("données incomplètes");CLIM={ok:true,mm}}
+ catch(e){CLIM={ok:false,err:e.message||String(e)}}
+ if(CUR==="calendrier")render()}
+function fenetre(c,wet){const cm=CYC[c.id],f=c.eau===1?.5:c.eau===2?.7:.85,ok=[];for(let s=0;s<12;s++){if(!wet[s])continue;let n=0;for(let k=0;k<Math.min(cm,12);k++)n+=wet[(s+k)%12]?1:0;if(cm>=12||n/cm>=f)ok.push(s)}return ok}
+function rng(a){if(!a.length)return"—";if(a.length===12)return"toute l’année";const g=[];a.forEach(m=>{const l=g[g.length-1];if(l&&m===l[l.length-1]+1)l.push(m);else g.push([m])});if(g.length>1&&g[0][0]===0&&g[g.length-1].slice(-1)[0]===11){const l=g.pop();g[0]=l.concat(g[0])}return g.map(x=>x.length>1?MOIS[x[0]]+" → "+MOIS[x[x.length-1]]:MOIS[x[0]]).join(" ; ")}
+function calendrier(){const z=zoneInfo(S);let b;
+ if(!CLIM)b=`<div class="banner">Choisissez d’abord une zone ou utilisez votre position (profil).</div>`;
+ else if(CLIM.loading)b=`<div class="banner">Chargement des pluies moyennes NASA POWER…</div>`;
+ else if(!CLIM.ok)b=`<div class="banner">Pluies moyennes indisponibles (${esc(CLIM.err)}). Aucun calendrier n’est inventé.${z?" Repère général de votre zone : "+z.c:""}</div>`;
+ else{const wet=CLIM.mm.map(v=>v>=80),mx=Math.max(...CLIM.mm);
+  b=`<div class="banner ok">Pluies moyennes mensuelles NASA POWER pour votre point (climatologie).</div><div class="card"><h2>Pluies par mois</h2><div class="mb">${CLIM.mm.map((v,i)=>`<i class="${wet[i]?"w":""}" style="height:${Math.max(4,v/mx*100)}%" title="${MOIS[i]} : ${Math.round(v)} mm"></i>`).join("")}</div><div class="ml">${MOIS.map(m=>`<span>${m[0].toUpperCase()}</span>`).join("")}</div><p class="mut">En vert : mois avec au moins 80 mm de pluie en moyenne.</p></div><div class="card tw" style="margin-top:14px"><h2>Que planter, et quand ?</h2><table><tr><th>Culture</th><th>Semis (pluies)</th><th>Récolte ≈</th></tr>${CROPS.map(c=>{const o=fenetre(c,wet),cm=CYC[c.id];return`<tr><td>${c.n}</td><td>${o.length?rng(o):"pas de fenêtre fiable sans irrigation"}</td><td>${!o.length?"—":cm>=12?"10–18 mois après le semis":rng(o.map(m=>(m+cm)%12).sort((a,b)=>a-b))}</td></tr>`}).join("")}</table>${S.eau==="Irrigation"?`<p class="mut">Avec irrigation, le semis est possible hors saison des pluies si l’eau suffit.</p>`:""}<p class="mut">Calcul à partir des pluies moyennes : il ne tient pas compte de l’année en cours, des variétés ni des températures. Validez avec un agronome local.</p></div>`}
+ return`<h1>Calendrier de semis</h1><p class="sub">${esc(S.loc||"")} · sol ${esc(S.sol.toLowerCase())} · eau : ${esc(S.eau.toLowerCase())}</p>${b}`}
+let REG=null;
+async function soilAt(c){const r=await fetch(`https://rest.isric.org/soilgrids/v2.0/properties/query?lon=${c[1]}&lat=${c[0]}&property=sand&property=clay&property=silt&depth=0-5cm&depth=5-15cm&depth=15-30cm&value=mean`);if(!r.ok)throw new Error("HTTP "+r.status);const L=(await r.json()).properties.layers,g=n=>{const l=L.find(x=>x.name===n),v=l.depths.map(d=>d.values.mean).filter(v=>v!=null);if(!v.length)throw new Error("vide");return v.reduce((a,b)=>a+b,0)/v.length/((l.unit_measure||{}).d_factor||10)};const sa=g("sand"),cl=g("clay"),si=g("silt");return{sand:sa,clay:cl,silt:si,type:soilType(sa,cl,si)}}
+function regCard(){if(!S.pays||!ZONES[S.pays])return'<h2>Sols de la région</h2><p class="mut">Pays non listé : utilisez votre position pour connaître votre sol.</p>';if(!REG||REG.loading)return'<h2>Sols de la région</h2><p class="mut">Chargement…</p>';return`<h2>Sols de la région (estimation) · ${esc(S.pays)}</h2>${regMap()}<table class="rg"><tr><th>Zone</th><th>Sol</th><th>Sable / argile</th></tr>${REG.items.map(i=>`<tr class="${i.zone===S.zone?"me":""}"><td>${esc(i.zone)}</td><td>${i.type||"—"}</td><td>${i.sand!=null?Math.round(i.sand)+" % / "+Math.round(i.clay)+" %":"indisponible"}</td></tr>`).join("")}</table><p class="mut">Estimations modélisées (ISRIC SoilGrids, 250 m), non confirmées sur le terrain. Votre zone est surlignée.</p>`}
+async function loadReg(){const zs=Object.keys(ZONES[S.pays]||{}).filter(z=>COORD[S.pays+"|"+z]).slice(0,12);if(!zs.length){REG=null;return}REG={loading:true};
+ const items=await Promise.all(zs.map(async z=>{try{return{zone:z,...await soilAt(COORD[S.pays+"|"+z])}}catch(e){return{zone:z,type:ZONES[S.pays][z].sol||""}}}));REG={items};const el=document.querySelector("#regc");if(el)el.innerHTML=regCard()}
+async function loadObs(){const c=coords();if(!c){OBS={ok:false,err:"Position inconnue : choisissez une zone ou utilisez votre position."};return}
+ OBS={loading:true};loadSoil();loadReg();loadClim();const f=x=>x.toISOString().slice(0,10).replace(/-/g,""),n=Date.now();
+ const u=`https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,GWETROOT,T2M&community=AG&longitude=${c[1]}&latitude=${c[0]}&start=${f(new Date(n-24*864e5))}&end=${f(new Date(n-2*864e5))}&format=JSON`;
+ try{const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);const p=(await r.json()).properties.parameter;const ok=k=>p.T2M[k]>-900&&p.GWETROOT[k]>-900;const days=Object.keys(p.T2M).filter(ok).sort(),last=days[days.length-1];if(!last)throw new Error("aucune valeur récente");
+  const rk=Object.keys(p.PRECTOTCORR).sort().filter(k=>k<=last&&p.PRECTOTCORR[k]>-900).slice(-7);
+  OBS={ok:true,lat:c[0],lon:c[1],date:last.slice(0,4)+"-"+last.slice(4,6)+"-"+last.slice(6),t2m:p.T2M[last],wet:p.GWETROOT[last],rain7:rk.reduce((a,k)=>a+p.PRECTOTCORR[k],0)}}
+ catch(e){OBS={ok:false,err:"Connexion à NASA POWER impossible ("+(e.message||e)+")."}}
+ if(["accueil","donnees"].includes(CUR))render()}
+function nasaFacts(){const L=[];if(OBS&&OBS.ok)L.push("• Humidité du sol (zone racinaire) : "+Math.round(OBS.wet*100)+" % · pluie des 7 derniers jours : "+Math.round(OBS.rain7)+" mm · température de l’air : "+Math.round(OBS.t2m)+" °C (NASA POWER, valeurs du "+OBS.date+").");if(CLIM&&CLIM.ok)L.push("• Mois généralement humides (≥ 80 mm, NASA POWER) : "+rng(CLIM.mm.map((v,i)=>v>=80?i:-1).filter(i=>i>=0))+".");if(SOIL&&SOIL.ok)L.push("• Sol (ISRIC SoilGrids) : "+SOIL.type+", sable "+Math.round(SOIL.sand)+" %, argile "+Math.round(SOIL.clay)+" %.");return L.join("\n")}
+const EN=[[/sol|terre/,"soil"],[/pluie|pr[ée]cipit/,"precipitation rainfall"],[/s[ée]cheresse|sec/,"drought"],[/humidit/,"soil moisture"],[/temp[ée]rature|chaleur/,"temperature"],[/ma[iï]s/,"maize"],[/riz/,"rice"],[/manioc/,"cassava"],[/soja/,"soybean"],[/irrigation|eau/,"irrigation water"],[/rendement|r[ée]colte|culture/,"crop yield"]];
+const tm=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(0),ms))]);
+async function nasaLib(q){const w=EN.filter(x=>x[0].test(q.toLowerCase())).map(x=>x[1]).join(" ")||"agriculture crops";const j=await (await fetch("https://images-api.nasa.gov/search?media_type=image&page_size=3&q="+encodeURIComponent(w))).json();return ((j.collection||{}).items||[]).slice(0,2).map(i=>{const d=i.data[0];return "• "+d.title+" : "+(d.description||"").replace(/\s+/g," ").slice(0,200)+"\nhttps://images.nasa.gov/details/"+d.nasa_id}).join("\n\n")}
+async function fallback(q){if(/caract[ée]ris|mon sol|type de sol|confirm/i.test(q))return GUIDE;if(/sc[ée]nario|simulation|rotation|recommand/i.test(q))return answer(q)+"\n\n(Réponse par règles : assistant libre indisponible ici.)";
+ const f=/pluie|humid|temp|nasa|donn|climat|m[ée]t[ée]o|semer|semis|planter|quand|sol/i.test(q)?nasaFacts():"";let a="",b="";try{a=await tm(nasaLib(q),8000)}catch(_){}try{b=await tm(web(q),8000)}catch(_){}
+ let o="";if(f)o+="Données NASA et sol chargées pour votre zone :\n"+f+"\n\n";if(a)o+="Ressources NASA :\n"+a+"\n\n";if(b)o+="Wikipédia :\n"+b+"\n\n";
+ return o?o.trim()+"\n\nSources externes : à croiser avec un agronome local.":answer(q)+"\n\n(Assistant libre et recherche web indisponibles ici : réponse simplifiée.)"}
+async function web(q){const u="https://fr.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(q+" agriculture")+"&gsrlimit=2&prop=extracts|info&inprop=url&exintro=1&explaintext=1&exchars=350&format=json&origin=*";const j=await (await fetch(u)).json();return Object.values((j.query||{}).pages||{}).sort((a,b)=>a.index-b.index).map(p=>"• "+p.title+" : "+(p.extract||"").trim()+"\n"+p.fullurl).join("\n\n")}
+const field=`<svg viewBox="0 0 200 120" style="width:100%;max-height:200px;border-radius:12px;background:#dbeee3"><path d="M20 90 L45 30 L120 18 L175 55 L150 100 L60 108Z" fill="#86d6a5" stroke="#0f3d2a" stroke-width="2.5"/><path d="M0 112 Q60 90 120 108 T200 96" stroke="#3b82f6" stroke-width="3" fill="none"/><text x="100" y="64" text-anchor="middle" font-size="11" fill="#0f3d2a" font-weight="700">${esc(S.ha)} ha</text></svg>`;
+function bienvenue(){const P=Object.keys(ZONES).concat("Autre pays");return`<section class="hero"><div class="orb"></div><div class="orb o2"></div><h1>Bienvenue sur FARM SHIFT AI</h1><p>1. Choisissez le pays · 2. Choisissez la région de la ferme · 3. Le sol de la région est déterminé automatiquement.</p><div class="vp"><span>Données NASA</span><span>Sol détecté</span><span>Calendrier de semis</span></div></section><div class="card" style="max-width:520px"><label for="pays">Pays</label><select id="pays"><option value="">Choisir…</option>${P.map(p=>`<option>${p}</option>`).join("")}</select><label for="zone">Région où se trouve la ferme</label><select id="zone" disabled><option>Choisir un pays d’abord</option></select><input id="zlib" placeholder="Votre région" hidden aria-label="Région" style="margin-top:8px"><p id="zc" class="mut"></p><p id="zs"></p><button id="cont">Continuer</button> <button class="sec" id="demo">Démo en 1 clic</button></div>`}
+function cmp(){const ax=[["Productivité","prod"],["Santé du sol","sol"],["Économie d’eau","eau"]];return`<div class="card tw" style="margin-top:14px"><h2>Comparaison</h2><p><b>Meilleur équilibre : ${(()=>{const a=R.sc.map(s=>(s.e.prod+s.e.sol+s.e.eau)/3),i=a.indexOf(Math.max(...a));return"Scénario "+(i+1)+" ("+R.sc[i].e.seq.map(x=>C[x].n).join(" → ")+")"})()}</b></p><table><tr><th></th>${R.sc.map((s,i)=>`<th>Scénario ${i+1}</th>`).join("")}</tr>${ax.map(([l,k])=>{const m=Math.max(...R.sc.map(s=>s.e[k]));return`<tr><td>${l}</td>${R.sc.map(s=>`<td${s.e[k]===m?' style="font-weight:800;color:var(--g)"':""}>${s.e[k]}${s.e[k]===m?" ★":""}</td>`).join("")}</tr>`}).join("")}</table><p class="mut">★ = meilleur score du critère.</p><button class="sec" id="cp">Copier le résumé</button></div>`}
+function nextStep(){const st=[["Pays et zone",1,"#bienvenue"],["Profil de la ferme",S.saved,"#profil"],["Première simulation",R&&R.sc,"#simulateur"],["Poser une question",S.asked,"#assistant"]];const n=st.find(x=>!x[1]);return`<div class="card"><h2>Votre parcours</h2><div class="dots2">${st.map(x=>`<span class="${x[1]?"ok":""}">${x[0]}</span>`).join("")}</div>${n?`<p class="mut">Prochaine étape : <b>${n[0]}</b></p><a class="btn" href="${n[2]}">Continuer</a>`:`<p class="mut">Parcours terminé. Affinez vos scénarios quand vous voulez.</p>`}</div>`}
+function cu(){document.querySelectorAll(".cu").forEach(el=>{const t=el.textContent,m=t.match(/[\d.]+/);if(!m||matchMedia("(prefers-reduced-motion:reduce)").matches)return;const v=parseFloat(m[0]),t0=performance.now();(function f(n){const k=Math.min(1,(n-t0)/900);el.textContent=t.replace(m[0],String(Math.round(v*(1-Math.pow(1-k,3)))));if(k<1)requestAnimationFrame(f)})(t0)})}
+const ASSISTANT_URL=""; // optionnel : URL d’un petit serveur qui appelle une IA (la clé API reste côté serveur)
+const HIST=[];
+async function ask(q){const c=document.querySelector("#chat");q=q.trim();if(!q)return;S.asked=true;save();c.insertAdjacentHTML("beforeend",`<div class="msg me">${esc(q)}</div><div class="msg ia"><span class="dots"><i></i><i></i><i></i></span></div>`);const cur=c.lastElementChild;HIST.push("Agriculteur : "+q);
+ const zi=zoneInfo(S),sim=R&&R.sc?R.sc.map(s=>s.t+" : "+s.e.seq.map(x=>C[x].n).join(" → ")+" (productivité "+s.e.prod+", sol "+s.e.sol+", eau "+s.e.eau+")").join(" ; "):"aucune simulation lancée";
+ const prompt="Tu es l’assistant agricole de FARM SHIFT AI. Réponds en français, de façon claire et pratique, à toute question liée à l’agriculture (cultures, semis, sols, fertilisation, maladies, ravageurs, irrigation, élevage, stockage, marchés, climat). Adapte-toi à la zone de l’utilisateur. Sois honnête sur l’incertitude, n’invente aucune mesure ni donnée satellite, et recommande un agronome ou un service de vulgarisation local pour les décisions importantes. Si la question n’a aucun rapport avec l’agriculture, redirige poliment. Réponds en 5 phrases maximum, précises, avec des chiffres quand tu en as. Pour caractériser le sol de l’utilisateur, pose une seule question à la fois (texture, couleur, drainage, pH, analyse déjà faite ou non). Le sol indiqué est une estimation régionale, sauf s’il est dit confirmé par un spécialiste.\nContexte : pays "+(S.pays||"?")+", zone "+(S.zone||"?")+(zi?" ("+zi.c+")":"")+" ; ferme "+S.ha+" ha, sol "+S.sol+" ("+(S.solConf==="oui"?"confirmé par un spécialiste":"estimation régionale, non confirmée")+(S.ph?", pH "+S.ph:"")+(S.drain?", drainage "+S.drain:"")+"), eau : "+S.eau+" ; cultures précédentes : "+S.prev.map(x=>C[x].n).join(", ")+" ; simulation (modèle illustratif) : "+sim+".\nDonnées NASA et sol de la zone (à citer si pertinent, source NASA POWER / ISRIC SoilGrids) : "+(nasaFacts()||"non chargées")+"\nConversation :\n"+HIST.slice(-8).join("\n")+"\nAssistant :";
+ try{if(ASSISTANT_URL){const rs=await fetch(ASSISTANT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});const j=await rs.json();cur.textContent=j.text;HIST.push("Assistant : "+j.text);return}if(typeof claude==="undefined")throw 0;const sm=await claude.use("sample");if(!sm)throw 0;const r=await Promise.race([sm(prompt,{cache:false,onText:({text})=>{cur.textContent=text}}),new Promise((_,j)=>setTimeout(()=>j(new Error("délai")),20000))]);cur.textContent=r.text;HIST.push("Assistant : "+r.text)}
+ catch(e){cur.textContent=await fallback(q)}}
+function dash(){const zi=zoneInfo(S);return`<section class="hero"><div class="orb"></div><div class="orb o2"></div><svg class="sat" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="48" fill="none" stroke="#8fd3ab" stroke-opacity=".5" stroke-dasharray="3 5"/><g class="orbit"><circle cx="60" cy="12" r="5" fill="#fff"/></g></svg><h1>Bonjour</h1><p>${esc(S.nom)} · ${esc(S.loc)}</p>${zi?`<p class="clim">${zi.c}</p>`:""}<p class="clim"><a href="#bienvenue">Changer de zone</a></p></section>${nextStep()}
+${obsBanner()}
+<div class="grid g4">${ind().map(i=>`<div class="card"><div class="mut">${i[0]}</div><div class="big cu">${i[1]}</div>${badge(i[3])}</div>`).join("")}</div>
+<div class="grid g2" style="margin-top:14px"><div class="card"><h2>Votre exploitation</h2>${field}<p class="mut">${esc(S.ha)} ha · sol ${esc(solLabel())} · eau : ${esc(S.eau.toLowerCase())}<br>Périmètre schématique (non géolocalisé).</p></div>
+<div class="card"><h2>Dernière analyse</h2>${R&&R.sc?R.sc.map(s=>`<p><b>${s.t}</b><br><span class="mut">${s.e.seq.map(x=>C[x].n).join(" → ")}</span></p>`).join(""):`<p class="mut">Aucune simulation lancée pour l’instant.</p>`}<a class="btn" href="#simulateur">Nouvelle simulation de rotation</a></div></div>`}
+function profil(){const opt=(a,v)=>a.map(x=>`<option${x===v?" selected":""}>${x}</option>`).join("");
+return`<h1>Profil de l’exploitation</h1><p class="sub">Ces informations restent sur votre appareil.</p>
+<div class="grid g2"><div class="card"><label for="nom">Nom</label><input id="nom" value="${esc(S.nom)}"><label for="loc">Localisation</label><input id="loc" value="${esc(S.loc)}">
+<label for="ha">Superficie (ha)</label><input id="ha" type="number" min="0.1" step="0.1" value="${esc(S.ha)}">
+<label for="sol">Type de sol</label><select id="sol">${opt(["Non déterminé","Argileux","Sableux","Sablo-argileux","Limoneux","Latéritique"],S.sol)}</select>
+<label for="eau">Accès à l’eau</label><select id="eau">${opt(Object.keys(SUPPLY),S.eau)}</select>
+<label>Cultures précédentes</label><div class="chips">${CROPS.map(c=>`<button class="chip${S.prev.includes(c.id)?" on":""}" data-prev="${c.id}">${c.n}</button>`).join("")}</div>
+<p><button id="sv">Enregistrer</button> <button class="sec" id="gps">Utiliser ma position</button> <span id="ok" class="mut"></span></p></div><div class="card" id="soilc">${soilCard()}</div><div class="card tw" id="regc">${regCard()}</div><div class="card"><h2>Périmètre</h2>${field}<p class="mut">Le tracé du champ sur carte n’est pas encore implémenté.</p><p class="mut">Version 6 · si un bouton ne répond plus : <button class="sec" id="rst">Réinitialiser l’appli</button></p></div></div>`}
+function donnees(){return`<h1>Données d’observation de la Terre</h1><p class="sub">Source et statut de chaque indicateur.</p>
+${obsBanner()}
+<div class="card tw"><table><tr><th>Indicateur</th><th>Valeur</th><th>Source cible</th><th>Statut</th><th>Date</th><th>Résolution</th></tr>${ind().map(i=>`<tr><td>${i[0]}</td><td>${i[1]}</td><td>${i[2]}</td><td>${badge(i[3])}</td><td>${i[4]}</td><td>${i[5]}</td></tr>`).join("")}</table></div>
+<div class="card" style="margin-top:14px"><h2>À propos de ces données</h2><p class="mut">Les satellites ne mesurent pas directement le rendement ni les nutriments du sol.</p></div>`}
+function cultures(){return`<h1>Bibliothèque des cultures</h1><p class="sub">Valeurs indicatives.</p><div class="grid g4">${CROPS.map(c=>`<div class="card"><h2>${c.n}</h2><div class="mut">${c.f} · cycle ${c.cycle}<br>Besoin en eau : ${["","faible","moyen","élevé"][c.eau]}<br>Effet sur l’azote : ${c.az>0?"enrichit":"consomme"}</div><p>${c.note}</p>${badge("DÉMO")}</div>`).join("")}</div>`}
+function simulateur(){const out=R?(R.err?`<div class="banner">${R.err}</div>`:resultats()):"";
+return`<h1>Simulateur de rotation</h1><p class="sub">Choisissez des cultures et une durée.</p>
+<div class="card"><label>Cultures candidates</label><div class="chips">${CROPS.map(c=>`<button class="chip${S.pool.includes(c.id)?" on":""}" data-pool="${c.id}">${c.n}</button>`).join("")}</div>
+<label for="ans">Durée de la rotation</label><select id="ans">${[2,3,4,5].map(n=>`<option value="${n}"${n===S.ans?" selected":""}>${n} ans (1 culture par an)</option>`).join("")}</select>
+<p class="mut">Terrain : ${esc(S.nom)} · ${esc(S.sol.toLowerCase())} · ${esc(S.eau.toLowerCase())}</p><button id="go">Lancer la simulation</button></div>${out}`}
+function bars(e){return[["Productivité relative",e.prod],["Santé du sol",e.sol],["Économie d’eau",e.eau]].map(([l,v])=>`<div class="mut">${l} : <b>${v}/100</b></div><div class="bar"><i style="width:${v}%"></i></div>`).join("")}
+function resultats(){return`<div class="grid g2" style="margin-top:14px">${R.sc.map(s=>`<div class="card"><h2>${s.t}</h2><div class="seq">${s.e.seq.map((x,i)=>`${i?"→ ":""}<span>${C[x].n}</span>`).join(" ")}</div><div style="margin-top:12px">${bars(s.e)}</div>${s.e.notes.length?`<p class="mut"><b>Pourquoi ces scores :</b><br>${s.e.notes.map(esc).join("<br>")}</p>`:""}</div>`).join("")}</div>
+${cmp()}<div class="card" style="margin-top:14px"><h2>Limites</h2><p class="mut">Scores relatifs, pas des rendements. Règles simples (famille de culture, azote, eau, sol), hypothèses non validées. Les indicateurs NASA affichés ne modifient pas encore le calcul. Un même réglage donne toujours le même résultat.</p></div>`}
+function assistant(){return`<h1>Assistant agricole</h1><p class="sub">Posez vos questions sur l’agriculture. Il utilise les données NASA de votre zone.</p>
+<div class="card"><div class="chat" id="chat"><div class="msg ia">Bonjour ! Posez-moi une question agricole. Mes conseils sont généraux : validez avec un agronome local.</div></div>
+<div class="ask"><input id="q" placeholder="Posez votre question agricole…" aria-label="Votre question"><button id="send">Envoyer</button></div><div class="chips" style="margin-top:14px">${["Quand semer dans ma zone ?","Comment vérifier mon type de sol ?","Quel scénario recommander ?"].map(q=>`<button class="chip" data-q="${q}">${q}</button>`).join("")}</div></div>`}
+function answer(q){
+ if(/sem(er|is|ailles)|planter|calendrier/i.test(q))return"Semez en début de saison des pluies de votre zone (voir le repère climat sur l’accueil), quand le sol est bien humide, et échelonnez les semis pour limiter les risques.";
+ if(/ravageur|insecte|chenille|maladie|parasite/i.test(q))return"Observez vos champs chaque semaine, identifiez le problème avant de traiter, et privilégiez la rotation, des variétés tolérantes et l’élimination des résidus infestés. Pour un traitement, demandez conseil à un service de vulgarisation local.";
+ if(/engrais|fertili|azote|sol/i.test(q))return"Les légumineuses (soja, haricot, arachide) enrichissent le sol en azote et précèdent bien les céréales. Pour doser un engrais, un test de sol ou l’avis d’un agronome local reste le plus fiable.";
+ if(/limite|fiab|certain/i.test(q))return"Les scores viennent d’un modèle à règles simples, avec des hypothèses illustratives et sans données satellite. Ce sont des comparaisons relatives, pas des prévisions de rendement.";
+ if(!R||!R.sc)return"Aucune simulation n’a encore été lancée. Allez dans « Simulateur » puis lancez-en une.";
+ const [a,b,c]=R.sc.map(s=>s.e),nm=e=>e.seq.map(x=>C[x].n).join(" → ");
+ if(/eau/i.test(q))return`Pour économiser l’eau, le scénario 3 (${nm(c)}) obtient ${c.eau}/100 sur ce critère, contre ${a.eau}/100 pour le scénario productivité. Votre accès à l’eau (${S.eau.toLowerCase()}) est pris en compte.`;
+ return`Selon vos priorités : productivité → ${nm(a)} (${a.prod}/100) ; sol → ${nm(b)} (${b.sol}/100) ; eau → ${nm(c)} (${c.eau}/100). Aucun scénario n’est « le meilleur » dans l’absolu : c’est un compromis, à valider avec un agronome local.`}
+function render(){try{render0()}catch(e){const m=document.getElementById("v");m.innerHTML='<div class="banner">Erreur d’affichage : '+esc(e.message||e)+'</div><p><button id="rst">Réinitialiser l’appli</button></p>';const r=document.getElementById("rst");if(r)r.onclick=()=>{try{localStorage.clear()}catch(_){}location.reload()}}}
+function render0(){
+ const h=CUR;let p=PAGES.find(x=>x[0]===h)?h:"accueil";if(!S.pays||h==="bienvenue")p="bienvenue";
+ const m=document.getElementById("v");m.classList.remove("in");m.innerHTML=({bienvenue,accueil:dash,profil,calendrier,donnees,cultures,simulateur,assistant})[p]();void m.offsetWidth;m.classList.add("in");document.querySelectorAll(".fab").forEach(x=>x.remove());if(p!=="assistant"&&p!=="bienvenue")document.body.insertAdjacentHTML("beforeend",'<a class="fab" href="#assistant" aria-label="Assistant IA" title="Assistant IA">✦</a>');window.scrollTo(0,0);
+ const nav=PAGES.map(x=>`<a href="#${x[0]}" class="${x[0]===p?"on":""}">${x[1]}</a>`).join("");
+ document.getElementById("nav").innerHTML=nav;document.getElementById("tabs").innerHTML=PAGES.map(x=>`<a href="#${x[0]}" class="${x[0]===p?"on":""}"><b>${x[2]}</b>${({profil:"Ferme",donnees:"Données",calendrier:"Semis",simulateur:"Simuler",assistant:"Assistant"})[x[0]]||x[1]}</a>`).join("");
+ bind(p);
+}
+function bind(p){const $=s=>document.querySelector(s);
+ document.querySelectorAll("[data-prev]").forEach(b=>b.onclick=()=>{b.classList.toggle("on")});
+ if($("#sv"))$("#sv").onclick=()=>{S.nom=$("#nom").value.trim()||DEF.nom;S.loc=$("#loc").value;S.ha=Math.max(.1,parseFloat($("#ha").value)||DEF.ha);if($("#sol").value!==S.sol)S.solAuto=false;S.sol=$("#sol").value;S.eau=$("#eau").value;S.prev=[...document.querySelectorAll("[data-prev].on")].map(b=>b.dataset.prev);S.saved=true;save();R=null;saveR();$("#ok").textContent="Enregistré."};
+ document.querySelectorAll("[data-pool]").forEach(b=>b.onclick=()=>{const id=b.dataset.pool;S.pool=S.pool.includes(id)?S.pool.filter(x=>x!==id):S.pool.concat(id);save();render()});
+ if($("#ans"))$("#ans").onchange=e=>{S.ans=+e.target.value;save()};
+ if($("#go"))$("#go").onclick=()=>{run();saveR();render()};
+ cu();document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>ask(b.dataset.q));
+ if($("#demo"))$("#demo").onclick=()=>{Object.assign(S,{pays:"RD Congo",zone:"Kinshasa",loc:"Kinshasa, RD Congo",saved:true});save();run();saveR();loadObs();go("simulateur")};
+ if($("#rst"))$("#rst").onclick=()=>{try{localStorage.clear()}catch(e){}location.hash="";location.reload()};
+ if($("#gps"))$("#gps").onclick=()=>{if(!navigator.geolocation){$("#ok").textContent="Position indisponible sur cet appareil.";return}$("#ok").textContent="Recherche de la position…";navigator.geolocation.getCurrentPosition(p=>{S.solAuto=true;S.lat=+p.coords.latitude.toFixed(3);S.lon=+p.coords.longitude.toFixed(3);save();loadObs();$("#ok").textContent="Position enregistrée."},()=>{$("#ok").textContent="Position refusée ou indisponible."})};
+ if($("#cp"))$("#cp").onclick=async()=>{const t="FARM SHIFT AI — "+S.nom+" ("+S.loc+")\n"+R.sc.map(s=>s.t+" : "+s.e.seq.map(x=>C[x].n).join(" → ")+" | productivité "+s.e.prod+", sol "+s.e.sol+", eau "+s.e.eau).join("\n")+"\nModèle illustratif, données démo.";try{await navigator.clipboard.writeText(t);$("#cp").textContent="Copié ✓"}catch(e){try{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");ta.remove();$("#cp").textContent=ok?"Copié ✓":"Copie impossible"}catch(_){$("#cp").textContent="Copie impossible"}}};
+ if($("#send")){const go=()=>{const i=$("#q");const v=i.value;i.value="";ask(v)};$("#send").onclick=go;$("#q").onkeydown=e=>{if(e.key==="Enter")go()}}
+ if($("#pays")){const info=()=>{const pp=$("#pays").value,zz=$("#zone").value,i=(ZONES[pp]||{})[zz];$("#zc").textContent=i?i.c:"";const el=$("#zs"),c=COORD[pp+"|"+zz];if(!el)return;if(!c){el.textContent="";return}el.textContent="Sol de la région : recherche…";const k=pp+zz;el.dataset.k=k;soilAt(c).then(s=>{if(el.dataset.k===k)el.innerHTML="Sol de la région : <b>"+s.type+"</b> (sable "+Math.round(s.sand)+" %, argile "+Math.round(s.clay)+" %) · ISRIC SoilGrids"}).catch(()=>{if(el.dataset.k===k)el.textContent=i&&i.sol?"Sol de la région (repère général) : "+i.sol:"Sol non déterminé : connexion à SoilGrids impossible."})};const fill=()=>{const p=$("#pays").value,z=$("#zone"),zl=$("#zlib");zl.hidden=true;if(!p){z.disabled=true;return}if(!ZONES[p]){z.innerHTML="<option>—</option>";z.disabled=true;zl.hidden=false;$("#zc").textContent="";return}z.disabled=false;z.innerHTML=Object.keys(ZONES[p]).map(k=>`<option>${k}</option>`).join("");info()};$("#pays").onchange=fill;$("#zone").onchange=info;$("#cont").onclick=()=>{const p=$("#pays").value;if(!p){$("#zc").textContent="Choisissez d’abord un pays.";return}const z=ZONES[p]?$("#zone").value:$("#zlib").value.trim();if(!z){$("#zc").textContent="Indiquez votre région.";return}S.pays=p;S.zone=z;S.loc=z+", "+p;delete S.lat;delete S.lon;S.solAuto=true;save();loadObs();go("profil")}}
+}
+addEventListener("error",e=>{document.body.insertAdjacentHTML("afterbegin",`<div class="banner" style="margin:8px">Une erreur est survenue (${esc(e.message)}). Ouvrez Exploitation → « Réinitialiser l’appli ».</div>`)});
+let CUR=(location.hash||"#accueil").slice(1);function go(p){CUR=p;try{history.replaceState(null,"","#"+p)}catch(e){}render()}
+addEventListener("hashchange",()=>{CUR=(location.hash||"#accueil").slice(1);render()});document.addEventListener("click",e=>{const t=e.target,rz=t.closest&&t.closest("[data-rz]");if(rz){RZ=rz.dataset.rz;const el=document.querySelector("#regc");if(el)el.innerHTML=regCard();return}if(t.id==="askSoil"){e.preventDefault();go("assistant");ask("Aide-moi à caractériser mon sol : pose-moi les questions utiles.");return}const a=t.closest&&t.closest('a[href^="#"]');if(!a)return;e.preventDefault();go(a.getAttribute("href").slice(1))});
+document.addEventListener("change",e=>{const k={sc:"solConf",ph:"ph",dr:"drain"}[e.target.id];if(k){S[k]=e.target.value;save()}});render();if(S.pays)loadObs();
+</script>
+</body>
+</html>
