@@ -1,1 +1,16 @@
-
+/* FARM SHIFT AI — Calendrier de semis (pluies moyennes NASA POWER) */
+(window.FSAI_FILES=window.FSAI_FILES||[]).push("fsai-calendar.js");
+let CLIM=null;const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],JM=[31,28.25,31,30,31,30,31,31,30,31,30,31],CYC={mais:4,manioc:12,soja:4,haricot:3,riz:5,arachide:4};
+async function loadClim(){const c=coords();if(!c){CLIM=null;return}CLIM={loading:true};
+ try{const r=await fetch(`https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=PRECTOTCORR&community=AG&longitude=${c[1]}&latitude=${c[0]}&format=JSON`);if(!r.ok)throw new Error("HTTP "+r.status);const p=(await r.json()).properties.parameter.PRECTOTCORR,K=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"],mm=K.map((k,i)=>p[k]*JM[i]);if(mm.some(v=>!(v>=0)))throw new Error("données incomplètes");CLIM={ok:true,mm}}
+ catch(e){CLIM={ok:false,err:e.message||String(e)}}
+ if(CUR==="calendrier")render()}
+function fenetre(c,wet){const cm=CYC[c.id],f=c.eau===1?.5:c.eau===2?.7:.85,ok=[];for(let s=0;s<12;s++){if(!wet[s])continue;let n=0;for(let k=0;k<Math.min(cm,12);k++)n+=wet[(s+k)%12]?1:0;if(cm>=12||n/cm>=f)ok.push(s)}return ok}
+function rng(a){if(!a.length)return"—";if(a.length===12)return"toute l’année";const g=[];a.forEach(m=>{const l=g[g.length-1];if(l&&m===l[l.length-1]+1)l.push(m);else g.push([m])});if(g.length>1&&g[0][0]===0&&g[g.length-1].slice(-1)[0]===11){const l=g.pop();g[0]=l.concat(g[0])}return g.map(x=>x.length>1?MOIS[x[0]]+" → "+MOIS[x[x.length-1]]:MOIS[x[0]]).join(" ; ")}
+function calendrier(){const z=zoneInfo(S);let b;
+ if(!CLIM)b=`<div class="banner">Choisissez d’abord une zone ou utilisez votre position (profil).</div>`;
+ else if(CLIM.loading)b=`<div class="banner">Chargement des pluies moyennes NASA POWER…</div>`;
+ else if(!CLIM.ok)b=`<div class="banner">Pluies moyennes indisponibles (${esc(CLIM.err)}). Aucun calendrier n’est inventé.${z?" Repère général de votre zone : "+z.c:""}</div>`;
+ else{const wet=CLIM.mm.map(v=>v>=80),mx=Math.max(...CLIM.mm);
+  b=`<div class="banner ok">Pluies moyennes mensuelles NASA POWER pour votre point (climatologie).</div><div class="card"><h2>Pluies par mois</h2><div class="mb">${CLIM.mm.map((v,i)=>`<i class="${wet[i]?"w":""}" style="height:${Math.max(4,v/mx*100)}%" title="${MOIS[i]} : ${Math.round(v)} mm"></i>`).join("")}</div><div class="ml">${MOIS.map(m=>`<span>${m[0].toUpperCase()}</span>`).join("")}</div><p class="mut">En vert : mois avec au moins 80 mm de pluie en moyenne.</p></div><div class="card tw" style="margin-top:14px"><h2>Que planter, et quand ?</h2><table><tr><th>Culture</th><th>Semis (pluies)</th><th>Récolte ≈</th></tr>${CROPS.map(c=>{const o=fenetre(c,wet),cm=CYC[c.id];return`<tr><td>${c.n}</td><td>${o.length?rng(o):"pas de fenêtre fiable sans irrigation"}</td><td>${!o.length?"—":cm>=12?"10–18 mois après le semis":rng(o.map(m=>(m+cm)%12).sort((a,b)=>a-b))}</td></tr>`}).join("")}</table>${S.eau==="Irrigation"?`<p class="mut">Avec irrigation, le semis est possible hors saison des pluies si l’eau suffit.</p>`:""}<p class="mut">Calcul à partir des pluies moyennes : il ne tient pas compte de l’année en cours, des variétés ni des températures. Validez avec un agronome local.</p></div>`}
+ return`<h1>Calendrier de semis</h1><p class="sub">${esc(S.loc||"")} · sol ${esc(S.sol.toLowerCase())} · eau : ${esc(S.eau.toLowerCase())}</p>${b}`}
